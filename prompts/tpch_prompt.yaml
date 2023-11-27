@@ -1,0 +1,102 @@
+    _type: prompt
+    input_variables:
+        ["input"]
+    template: 
+        '''Given below are the table structures in analytics database raw schema in snowflake cloud database
+              CUSTOMER (
+              C_CUSTKEY NUMBER(38,0),
+              C_NAME VARCHAR(25),
+              C_ADDRESS VARCHAR(40),
+              C_NATIONKEY NUMBER(38,0),
+              C_PHONE VARCHAR(15),
+              C_ACCTBAL NUMBER(12,2),
+              C_MKTSEGMENT VARCHAR(10),
+              C_COMMENT VARCHAR(117)
+          );
+          LINEITEM (
+              L_ORDERKEY NUMBER(38,0),
+              L_PARTKEY NUMBER(38,0),
+              L_SUPPKEY NUMBER(38,0),
+              L_LINENUMBER NUMBER(38,0),
+              L_QUANTITY NUMBER(12,2),
+              L_EXTENDEDPRICE NUMBER(12,2),
+              L_DISCOUNT NUMBER(12,2),
+              L_TAX NUMBER(12,2),
+              L_RETURNFLAG VARCHAR(1),
+              L_LINESTATUS VARCHAR(1),
+              L_SHIPDATE DATE,
+              L_COMMITDATE DATE,
+              L_RECEIPTDATE DATE,
+              L_SHIPINSTRUCT VARCHAR(25),
+              L_SHIPMODE VARCHAR(10),
+              L_COMMENT VARCHAR(44)
+          );
+          NATION (
+              N_NATIONKEY NUMBER(38,0),
+              N_NAME VARCHAR(25),
+              N_REGIONKEY NUMBER(38,0),
+              N_COMMENT VARCHAR(152)
+          );
+          PART (
+              P_PARTKEY NUMBER(38,0),
+              P_NAME VARCHAR(55),
+              P_MFGR VARCHAR(25),
+              P_BRAND VARCHAR(10),
+              P_TYPE VARCHAR(25),
+              P_SIZE NUMBER(38,0),
+              P_CONTAINER VARCHAR(10),
+              P_RETAILPRICE NUMBER(12,2),
+              P_COMMENT VARCHAR(23)
+          );
+          PARTSUPP (
+              PS_PARTKEY NUMBER(38,0),
+              PS_SUPPKEY NUMBER(38,0),
+              PS_AVAILQTY NUMBER(38,0),
+              PS_SUPPLYCOST NUMBER(12,2),
+              PS_COMMENT VARCHAR(199)
+          );
+          REGION (
+              R_REGIONKEY NUMBER(38,0),
+              R_NAME VARCHAR(25),
+              R_COMMENT VARCHAR(152)
+          );
+          SUPPLIER (
+              S_SUPPKEY NUMBER(38,0),
+              S_NAME VARCHAR(25),
+              S_ADDRESS VARCHAR(40),
+              S_NATIONKEY NUMBER(38,0),
+              S_PHONE VARCHAR(15),
+              S_ACCTBAL NUMBER(12,2),
+              S_COMMENT VARCHAR(101)
+          );
+          ORDERS (
+              O_ORDERKEY NUMBER(38,0),
+              O_CUSTKEY NUMBER(38,0),
+              O_ORDERSTATUS VARCHAR(1),
+              O_TOTALPRICE NUMBER(12,2),
+              O_ORDERDATE DATE,
+              O_ORDERPRIORITY VARCHAR(15),
+              O_CLERK VARCHAR(15),
+              O_SHIPPRIORITY NUMBER(38,0),
+              O_COMMENT VARCHAR(79)
+          );
+                  take user questions and response back with sql query.
+              example : 
+              user question : give me the number of orders placed in last 10 days
+              your generated sql query : select o_orderdate , count(*) from analytics.raw.orders  where o_orderdate between current_date()-10 and current_date() group by o_orderdate ;
+              example :
+              user question : tell me top 3 nations having the maximum orders
+              your generated sql query : select n.n_name , count(*) as order_count from analytics.raw.orders o 
+                                          inner join analytics.raw.customer c on o.o_custkey = c.c_custkey
+                                          inner join analytics.raw.nation n on c.c_nationkey = n.n_nationkey
+                                          group by n.n_name order by order_count desc limit 3
+                                          ;
+              example :
+              user_question : give me the name and address of suppliers for which the available quatity is minimum
+              your generated sql query :select distinct s.s_name ,s.s_address
+                                          from analytics.raw.part p
+                                          inner join analytics.raw.partsupp ps on p.p_partkey = ps.ps_partkey
+                                          inner join analytics.raw.supplier s on ps.ps_suppkey = s.s_suppkey
+                                          where p.p_partkey in (select ps2.ps_partkey  from analytics.raw.partsupp ps2 order by ps_availqty asc limit 1 );
+              user question : {input}
+              your generated sql query : '''
